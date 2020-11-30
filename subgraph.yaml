@@ -1,0 +1,63 @@
+specVersion: 0.0.1
+description: Zoracles Governance Subgraph
+repository: https://github.com/zoracles/governance-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: GovernorAlpha
+    network: mainnet
+    source:
+      address: '0xA7D2556Ac0F6cdCf264Ab882e5145A850e0cf7c3'
+      abi: GovernorAlpha
+      startBlock: 11334923
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/mappings.ts
+      entities:
+        - Delegate
+        - TokenHolder
+        - Proposal
+        - Vote
+        - Governance
+      abis:
+        - name: GovernorAlpha
+          file: ./abis/GovernorAlpha.json
+      eventHandlers:
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        - event: ProposalCanceled(uint256)
+          handler: handleProposalCanceled
+        - event: ProposalQueued(uint256,uint256)
+          handler: handleProposalQueued
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecuted
+        - event: VoteCast(address,uint256,bool,uint256)
+          handler: handleVoteCast
+  - kind: ethereum/contract
+    name: ZoraclesToken
+    network: mainnet
+    source:
+      address: '0xD8E3FB3b08eBA982F2754988d70D57eDc0055ae6'
+      abi: ZoraclesToken
+      startBlock: 11334316
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/mappings.ts
+      entities:
+        - Delegate
+        - TokenHolder
+      abis:
+        - name: ZoraclesToken
+          file: ./abis/ZoraclesToken.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
